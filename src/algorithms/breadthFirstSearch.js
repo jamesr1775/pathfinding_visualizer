@@ -13,10 +13,9 @@ export function breadthFirstSearch(grid, startNode, finishNode) {
   while (queue.length > 0) {
     //sortNodesByDistance(unvisitedNodes);
     const currentNode = queue.shift();
+    if (currentNode.isWall) continue;
     currentNode.isVisited = true;
     utils.updateUnvisitedNeighbors(currentNode, grid);
-
-    if (currentNode.isWall) continue;
 
     visitedNodesInOrder.push(currentNode);
     let neighbouringNodes = utils.getUnvisitedNeighbors(currentNode, grid);
