@@ -10,11 +10,18 @@ const algorithms = [
   { label: "Depth First Search", value: 4 },
   { label: "Greedy", value: 5 },
 ];
-
+const patterns = [
+  { label: "Basic Random Maze", value: 1 },
+  { label: "Simple Stair Pattern", value: 2 },
+];
 export class Header extends Component {
-  handleChange = (e) => {
+  handleChangeAlgorithm = (e) => {
     //console.log(e.label);
     this.props.selectAlgorithm(e.label);
+  };
+  handleChangeMaze = (e) => {
+    //console.log(e.label);
+    this.props.selectMaze(e.label);
   };
 
   render() {
@@ -35,7 +42,22 @@ export class Header extends Component {
                     primary25: "teal",
                   },
                 })}
-                onChange={this.handleChange}
+                onChange={this.handleChangeAlgorithm}
+              />
+            </div>
+            <div className="dropdown" style={headerStyle}>
+              <Select
+                placeholder={"Mazes & Patterns"}
+                options={patterns}
+                styles={dropDownStyles}
+                theme={(theme) => ({
+                  ...theme,
+                  colors: {
+                    ...theme.colors,
+                    primary25: "teal",
+                  },
+                })}
+                onChange={this.handleChangeMaze}
               />
             </div>
             <button
@@ -77,6 +99,7 @@ export default Header;
 
 Header.propTypes = {
   selectAlgorithm: PropTypes.func.isRequired,
+  selectMaze: PropTypes.func.isRequired,
   visualizeAlgorithm: PropTypes.func.isRequired,
   algorithm: PropTypes.object.isRequired,
   getClearGrid: PropTypes.func.isRequired,
@@ -106,6 +129,9 @@ const dropDownStyles = {
     borderRadius: state.isFocused ? "3px 3px 0 0" : 3,
     borderColor: state.isFocused ? "#34495e" : "#34495e",
     boxShadow: state.isFocused ? null : null,
+    "&:hover": {
+      background: "teal",
+    },
   }),
   menu: (base) => ({
     ...base,

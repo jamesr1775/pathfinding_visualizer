@@ -29,6 +29,7 @@ export default class PathfindingVisualizer extends Component {
       finishRow: FINISH_NODE_ROW,
       finishCol: FINISH_NODE_COL,
       algorithm: "",
+      maze: "",
     };
   }
 
@@ -164,6 +165,41 @@ export default class PathfindingVisualizer extends Component {
     this.setState({ algorithm: algorithm });
     console.log(this.state.algorithm);
   };
+  selectMaze = (maze) => {
+    console.log("select Maze");
+    this.setState({ maze: maze });
+    console.log(this.state.maze);
+    this.getBasicRandomMaze();
+  };
+  getBasicRandomMaze = () => {
+    const grid = this.state.grid;
+    for (let row = 0; row < NUM_GRID_ROWS; row++) {
+      for (let col = 0; col < NUM_GRID_COLS; col++) {
+        let isWall = Math.floor(Math.random() * 10);
+        const node = grid[row][col];
+        if (!node.isStart && !node.isFinish) {
+          node.isWall = isWall > 6 ? true : false;
+        }
+        node.isVisited = false;
+        node.distance = Infinity;
+        node.previousNode = null;
+        if (node.isStart) {
+          document.getElementById(`node-${node.row}-${node.col}`).className =
+            "node node-start";
+        } else if (node.isFinish) {
+          document.getElementById(`node-${node.row}-${node.col}`).className =
+            "node node-finish";
+        } else if (node.isWall) {
+          document.getElementById(`node-${node.row}-${node.col}`).className =
+            "node node-wall";
+        } else {
+          document.getElementById(`node-${node.row}-${node.col}`).className =
+            "node ";
+        }
+      }
+    }
+    this.setState({ grid });
+  };
 
   visualizeAlgorithm() {
     const {
@@ -188,22 +224,22 @@ export default class PathfindingVisualizer extends Component {
     this.animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder);
   }
 
-  visualizeDijkstra() {
-    const { grid, startRow, startCol, finishRow, finishCol } = this.state;
-    const startNode = grid[startRow][startCol];
-    const finishNode = grid[finishRow][finishCol];
-    const visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
-    const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
-    this.animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder);
-  }
-  visualizeBreadthFirstSearch() {
-    const { grid, startRow, startCol, finishRow, finishCol } = this.state;
-    const startNode = grid[startRow][startCol];
-    const finishNode = grid[finishRow][finishCol];
-    const visitedNodesInOrder = breadthFirstSearch(grid, startNode, finishNode);
-    const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
-    this.animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder);
-  }
+  // visualizeDijkstra() {
+  //   const { grid, startRow, startCol, finishRow, finishCol } = this.state;
+  //   const startNode = grid[startRow][startCol];
+  //   const finishNode = grid[finishRow][finishCol];
+  //   const visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
+  //   const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
+  //   this.animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder);
+  // }
+  // visualizeBreadthFirstSearch() {
+  //   const { grid, startRow, startCol, finishRow, finishCol } = this.state;
+  //   const startNode = grid[startRow][startCol];
+  //   const finishNode = grid[finishRow][finishCol];
+  //   const visitedNodesInOrder = breadthFirstSearch(grid, startNode, finishNode);
+  //   const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
+  //   this.animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder);
+  // }
 
   render() {
     const { grid, mouseIsPressed } = this.state;
@@ -212,6 +248,7 @@ export default class PathfindingVisualizer extends Component {
       <>
         <Header
           selectAlgorithm={this.selectAlgorithm}
+          selectMaze={this.selectMaze}
           algorithm={this.state.algorithm}
           visualizeAlgorithm={this.visualizeAlgorithm.bind(this)}
           getClearGrid={this.getClearGrid.bind(this)}
