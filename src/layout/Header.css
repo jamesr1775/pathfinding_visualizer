@@ -1,0 +1,27 @@
+.container {
+  width: 100%;
+  padding-right: 5px;
+  padding-left: 20px;
+  margin-right: auto;
+  margin-left: auto;
+}
+.row {
+  /* display: -ms-flexbox; */
+  display: flex;
+  /* background-color: blue !important; */
+
+  /* -ms-flex-wrap: wrap; */
+  /* flex-wrap: wrap; */
+  /* margin-right: -15px; */
+  /* margin-left: -15px; */
+}
+.dropdown {
+  /* -ms-flex: 0 0 33.333333%; */
+  flex: 0 0 20%;
+  /* background-color: blue !important; */
+  /* max-width: 33.333333%; */
+}
+
+.css-1wa3eu0-placeholder {
+  color: white !important;
+}

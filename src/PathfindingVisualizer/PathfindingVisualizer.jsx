@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Node from "./Node/Node";
+import Header from "../layout/Header";
 import { dijkstra } from "../algorithms/dijkstra";
 import { breadthFirstSearch } from "../algorithms/breadthFirstSearch";
 
@@ -27,6 +28,7 @@ export default class PathfindingVisualizer extends Component {
       startCol: START_NODE_COL,
       finishRow: FINISH_NODE_ROW,
       finishCol: FINISH_NODE_COL,
+      algorithm: "",
     };
   }
 
@@ -157,6 +159,35 @@ export default class PathfindingVisualizer extends Component {
     this.setState({ grid });
   };
 
+  selectAlgorithm = (algorithm) => {
+    console.log("select Algo");
+    this.setState({ algorithm: algorithm });
+    console.log(this.state.algorithm);
+  };
+
+  visualizeAlgorithm() {
+    const {
+      grid,
+      startRow,
+      startCol,
+      finishRow,
+      finishCol,
+      algorithm,
+    } = this.state;
+    const startNode = grid[startRow][startCol];
+    const finishNode = grid[finishRow][finishCol];
+    let visitedNodesInOrder;
+    if (algorithm === "Dijstra's Algorithm") {
+      visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
+    } else if (algorithm === "Breadth First Search") {
+      visitedNodesInOrder = breadthFirstSearch(grid, startNode, finishNode);
+    } else {
+      return;
+    }
+    const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
+    this.animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder);
+  }
+
   visualizeDijkstra() {
     const { grid, startRow, startCol, finishRow, finishCol } = this.state;
     const startNode = grid[startRow][startCol];
@@ -179,14 +210,24 @@ export default class PathfindingVisualizer extends Component {
 
     return (
       <>
-        <button onClick={() => this.visualizeDijkstra()}>
-          Visualize Dijkstra's Algorithm
-        </button>
-        <button onClick={() => this.visualizeBreadthFirstSearch()}>
+        <Header
+          selectAlgorithm={this.selectAlgorithm}
+          algorithm={this.state.algorithm}
+          visualizeAlgorithm={this.visualizeAlgorithm.bind(this)}
+          getClearGrid={this.getClearGrid.bind(this)}
+        >
+          {" "}
+        </Header>
+        {/* <button
+          onClick={() => this.visualizeAlgorithm()}
+          disabled={this.state.algorithm === ""}
+        >
+          Visualize
+        </button> */}
+        {/* <button onClick={() => this.visualizeBreadthFirstSearch()}>
           Visualize Breadth First Search Algorithm
-        </button>
-        <button onClick={() => this.getClearGrid(grid)}>Clear Board</button>
-
+        </button> */}
+        {/* <button onClick={() => this.getClearGrid(grid)}>Clear Board</button> */}
         <div className="grid">
           {grid.map((row, rowIdx) => {
             return (
