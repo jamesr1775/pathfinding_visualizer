@@ -29,15 +29,20 @@ export function generateRecursiveMaze(grid, rowStart, rowEnd, colStart, colEnd, 
     let colRand = possibleCols[randColIdx];
     for (let row = 0; row < maxRows; row++) {
       for (let col = 0; col < maxCols; col++) {
+        const currentNode = grid[row][col];
         if (
           row === currentRow &&
           col !== colRand &&
           col >= colStart - 1 &&
           col <= colEnd + 1 &&
-          !grid[row][col].isStart &&
-          !grid[row][col].isFinish
+          !currentNode.isStart &&
+          !currentNode.isFinish
         ) {
-          grid[row][col].isWall = true;
+          currentNode.isVisited = false;
+          currentNode.distance = Infinity;
+          currentNode.totDistance = Infinity;
+          currentNode.previousNode = null;
+          currentNode.isWall = true;
         }
       }
     }
@@ -67,15 +72,20 @@ export function generateRecursiveMaze(grid, rowStart, rowEnd, colStart, colEnd, 
     let currentCol = possibleCols[randColIdx];
     for (let row = 0; row < maxRows; row++) {
       for (let col = 0; col < maxCols; col++) {
+        const currentNode = grid[row][col];
         if (
           col === currentCol &&
           row !== randRow &&
           row >= rowStart - 1 &&
           row <= rowEnd + 1 &&
-          !grid[row][col].isStart &&
-          !grid[row][col].isFinish
+          !currentNode.isStart &&
+          !currentNode.isFinish
         ) {
-          grid[row][col].isWall = true;
+          currentNode.isVisited = false;
+          currentNode.distance = Infinity;
+          currentNode.totDistance = Infinity;
+          currentNode.previousNode = null;
+          currentNode.isWall = true;
         }
       }
     }
