@@ -1,23 +1,23 @@
 {
   "files": {
-    "main.css": "/pathfinding-visualizer/static/css/main.1c7b9a33.chunk.css",
-    "main.js": "/pathfinding-visualizer/static/js/main.28e0dce7.chunk.js",
-    "main.js.map": "/pathfinding-visualizer/static/js/main.28e0dce7.chunk.js.map",
-    "runtime-main.js": "/pathfinding-visualizer/static/js/runtime-main.e4e2e9d5.js",
-    "runtime-main.js.map": "/pathfinding-visualizer/static/js/runtime-main.e4e2e9d5.js.map",
-    "static/js/2.7a8f4827.chunk.js": "/pathfinding-visualizer/static/js/2.7a8f4827.chunk.js",
-    "static/js/2.7a8f4827.chunk.js.map": "/pathfinding-visualizer/static/js/2.7a8f4827.chunk.js.map",
-    "index.html": "/pathfinding-visualizer/index.html",
-    "precache-manifest.b50893c9e744cda03dd5f5a0450b409b.js": "/pathfinding-visualizer/precache-manifest.b50893c9e744cda03dd5f5a0450b409b.js",
-    "service-worker.js": "/pathfinding-visualizer/service-worker.js",
-    "static/css/main.1c7b9a33.chunk.css.map": "/pathfinding-visualizer/static/css/main.1c7b9a33.chunk.css.map",
-    "static/js/2.7a8f4827.chunk.js.LICENSE.txt": "/pathfinding-visualizer/static/js/2.7a8f4827.chunk.js.LICENSE.txt",
-    "static/media/Legend.css": "/pathfinding-visualizer/static/media/triangleRight.49fad9e6.svg"
+    "main.css": "/my-app/static/css/main.a3b9a23d.chunk.css",
+    "main.js": "/my-app/static/js/main.514d3734.chunk.js",
+    "main.js.map": "/my-app/static/js/main.514d3734.chunk.js.map",
+    "runtime-main.js": "/my-app/static/js/runtime-main.58a6d01e.js",
+    "runtime-main.js.map": "/my-app/static/js/runtime-main.58a6d01e.js.map",
+    "static/js/2.7a8f4827.chunk.js": "/my-app/static/js/2.7a8f4827.chunk.js",
+    "static/js/2.7a8f4827.chunk.js.map": "/my-app/static/js/2.7a8f4827.chunk.js.map",
+    "index.html": "/my-app/index.html",
+    "precache-manifest.11d7e05a2c7dbfd5d47d1f127e497168.js": "/my-app/precache-manifest.11d7e05a2c7dbfd5d47d1f127e497168.js",
+    "service-worker.js": "/my-app/service-worker.js",
+    "static/css/main.a3b9a23d.chunk.css.map": "/my-app/static/css/main.a3b9a23d.chunk.css.map",
+    "static/js/2.7a8f4827.chunk.js.LICENSE.txt": "/my-app/static/js/2.7a8f4827.chunk.js.LICENSE.txt",
+    "static/media/Legend.css": "/my-app/static/media/triangleRight.49fad9e6.svg"
   },
   "entrypoints": [
-    "static/js/runtime-main.e4e2e9d5.js",
+    "static/js/runtime-main.58a6d01e.js",
     "static/js/2.7a8f4827.chunk.js",
-    "static/css/main.1c7b9a33.chunk.css",
-    "static/js/main.28e0dce7.chunk.js"
+    "static/css/main.a3b9a23d.chunk.css",
+    "static/js/main.514d3734.chunk.js"
   ]
 }
