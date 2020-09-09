@@ -1,33 +1,42 @@
 import React, { Component } from "react";
 import Node from "./Node/Node";
 import Header from "../layout/Header";
+
 import { dijkstra } from "../algorithms/dijkstra";
 import { breadthFirstSearch } from "../algorithms/breadthFirstSearch";
-
+import { astar } from "../algorithms/astar";
+import { greedy } from "../algorithms/greedy";
 import { getNodesInShortestPathOrder } from "../algorithms/algorithmUtils";
+
+import { generateBasicRandomMaze } from "../mazeGenAlgorithms/basicRandomMaze";
+import { generateStairMaze } from "../mazeGenAlgorithms/stairMaze";
+import { generateRecursiveMaze } from "../mazeGenAlgorithms/recursiveMaze";
 
 import "./PathfindingVisualizer.css";
 
 const NUM_GRID_ROWS = 30;
-const NUM_GRID_COLS = 50;
+const NUM_GRID_COLS = 75;
 
 const START_NODE_ROW = 14;
-const START_NODE_COL = 15;
+const START_NODE_COL = 16;
 const FINISH_NODE_ROW = 14;
 const FINISH_NODE_COL = 19;
 
 export default class PathfindingVisualizer extends Component {
   constructor() {
     super();
+
+    this.moveStartPos = false;
+    this.startRow = START_NODE_ROW;
+    this.startCol = START_NODE_COL;
+    this.mouseIsPressed = false;
+    this.moveFinishPos = false;
+    this.lastNodeWasWall = false;
+    this.finishRow = FINISH_NODE_ROW;
+    this.finishCol = FINISH_NODE_COL;
+
     this.state = {
       grid: [],
-      mouseIsPressed: false,
-      moveStartPos: false,
-      moveFinishPos: false,
-      startRow: START_NODE_ROW,
-      startCol: START_NODE_COL,
-      finishRow: FINISH_NODE_ROW,
-      finishCol: FINISH_NODE_COL,
       algorithm: "",
       maze: "",
     };
@@ -38,73 +47,78 @@ export default class PathfindingVisualizer extends Component {
     this.setState({ grid });
   }
 
-  handleMouseDown(row, col) {
+  handleMouseDown(e, row, col) {
+    e.preventDefault();
     const { grid, moveStartPos } = this.state;
+    let currentNode = grid[row][col];
+    // let currentElement = document.getElementById(`node-${row}-${col}`);
 
-    if (grid[row][col].isStart) {
-      this.setState({ grid: grid, mouseIsPressed: true, moveStartPos: true });
-    } else if (grid[row][col].isFinish) {
-      this.setState({ grid: grid, mouseIsPressed: true, moveFinishPos: true });
+    this.mouseIsPressed = true;
+    if (currentNode.isStart) {
+      this.moveStartPos = true;
+    } else if (currentNode.isFinish) {
+      this.moveFinishPos = true;
     } else if (!moveStartPos) {
-      const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
-      this.setState({
-        grid: newGrid,
-        mouseIsPressed: true,
-      });
+      getNewGridWithWallToggled(grid, row, col);
     }
   }
 
-  handleMouseEnter(row, col) {
-    const {
-      grid,
-      mouseIsPressed,
-      moveStartPos,
-      startRow,
-      startCol,
-      moveFinishPos,
-      finishRow,
-      finishCol,
-    } = this.state;
-    if (!mouseIsPressed) return;
-    if (moveStartPos) {
-      grid[startRow][startCol].isStart = false;
-      grid[row][col].isStart = true;
-      this.setState({
-        grid: grid,
-        moveStartPos: true,
-        startRow: row,
-        startCol: col,
-      });
-    } else if (moveFinishPos) {
-      grid[finishRow][finishCol].isFinish = false;
-      grid[row][col].isFinish = true;
-      this.setState({
-        grid: grid,
-        moveFinishPos: true,
-        finishRow: row,
-        finishCol: col,
-      });
+  handleMouseEnter(e, row, col) {
+    e.preventDefault();
+    const { grid } = this.state;
+    let currentNode = grid[row][col];
+    let currentElement = document.getElementById(`node-${row}-${col}`);
+    if (!this.mouseIsPressed) return;
+    if (this.moveStartPos) {
+      let lastStartNode = grid[this.startRow][this.startCol];
+      lastStartNode.isStart = false;
+      if (this.lastNodeWasWall) {
+        this.lastNodeWasWall = false;
+        lastStartNode.isWall = true;
+      }
+      let lastStartElement = document.getElementById(`node-${this.startRow}-${this.startCol}`);
+      lastStartElement.className = lastStartNode.isWall ? "node node-wall" : "node node-unvisited";
+      currentNode.isStart = true;
+      this.startRow = row;
+      this.startCol = col;
+      currentElement.className = "node node-start";
+      if (currentNode.isWall) {
+        this.lastNodeWasWall = true;
+        currentNode.isWall = false;
+      }
+    } else if (this.moveFinishPos) {
+      let lastFinishNode = grid[this.finishRow][this.finishCol];
+      lastFinishNode.isFinish = false;
+      if (this.lastNodeWasWall) {
+        this.lastNodeWasWall = false;
+        lastFinishNode.isWall = true;
+      }
+      let lastFinishElement = document.getElementById(`node-${this.finishRow}-${this.finishCol}`);
+      lastFinishElement.className = lastFinishNode.isWall ? "node node-wall" : "node node-unvisited";
+      currentNode.isFinish = true;
+      this.finishRow = row;
+      this.finishCol = col;
+      currentElement.className = "node node-finish";
+      if (currentNode.isWall) {
+        this.lastNodeWasWall = true;
+        currentNode.isWall = false;
+      }
     } else {
-      const newGrid = getNewGridWithWallToggled(grid, row, col);
-      this.setState({ grid: newGrid });
+      getNewGridWithWallToggled(grid, row, col);
     }
   }
 
-  handleMouseUp() {
-    const { grid, moveStartPos, moveFinishPos } = this.state;
-    if (moveStartPos) {
-      //grid[row][col].isStart = true;
-      this.setState({ grid: grid, mouseIsPressed: false, moveStartPos: false });
-    } else if (moveFinishPos) {
-      //grid[row][col].isStart = true;
-      this.setState({
-        grid: grid,
-        mouseIsPressed: false,
-        moveFinishPos: false,
-      });
-    } else {
-      this.setState({ mouseIsPressed: false });
-    }
+  handleMouseUp(e) {
+    //const { grid, moveStartPos, moveFinishPos } = this.state;
+    this.mouseIsPressed = false;
+    this.moveStartPos = false;
+    this.moveFinishPos = false;
+    // if (moveStartPos) {
+    //   this.setState({ grid: grid, mouseIsPressed: false, moveStartPos: false });
+    // } else if (moveFinishPos) {
+    // } else {
+    //   this.setState({ mouseIsPressed: false });
+    // }
   }
 
   animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder) {
@@ -117,19 +131,24 @@ export default class PathfindingVisualizer extends Component {
       }
       setTimeout(() => {
         const node = visitedNodesInOrder[i];
-        document.getElementById(`node-${node.row}-${node.col}`).className =
-          "node node-visited";
+        document.getElementById(`node-${node.row}-${node.col}`).className = "node node-visited";
       }, 10 * i);
     }
   }
-
+  animateMaze(visitedNodesInOrder) {
+    for (let i = 0; i <= visitedNodesInOrder.length; i++) {
+      setTimeout(() => {
+        const node = visitedNodesInOrder[i];
+        document.getElementById(`node-${node.row}-${node.col}`).className = "node node-wall";
+      }, 10 * i);
+    }
+  }
   animateShortestPath(nodesInShortestPathOrder) {
     for (let i = 0; i < nodesInShortestPathOrder.length; i++) {
       setTimeout(() => {
         const node = nodesInShortestPathOrder[i];
-        document.getElementById(`node-${node.row}-${node.col}`).className =
-          "node node-shortest-path";
-      }, 50 * i);
+        document.getElementById(`node-${node.row}-${node.col}`).className = "node node-shortest-path";
+      }, 25 * i);
     }
   }
 
@@ -141,19 +160,16 @@ export default class PathfindingVisualizer extends Component {
         const node = grid[row][col];
         node.isVisited = false;
         node.distance = Infinity;
+        node.totDistance = Infinity;
         node.previousNode = null;
         if (node.isStart) {
-          document.getElementById(`node-${node.row}-${node.col}`).className =
-            "node node-start";
+          document.getElementById(`node-${node.row}-${node.col}`).className = "node node-start";
         } else if (node.isFinish) {
-          document.getElementById(`node-${node.row}-${node.col}`).className =
-            "node node-finish";
+          document.getElementById(`node-${node.row}-${node.col}`).className = "node node-finish";
         } else if (node.isWall) {
-          document.getElementById(`node-${node.row}-${node.col}`).className =
-            "node node-wall";
+          document.getElementById(`node-${node.row}-${node.col}`).className = "node node-wall";
         } else {
-          document.getElementById(`node-${node.row}-${node.col}`).className =
-            "node ";
+          document.getElementById(`node-${node.row}-${node.col}`).className = "node ";
         }
       }
     }
@@ -161,85 +177,55 @@ export default class PathfindingVisualizer extends Component {
   };
 
   selectAlgorithm = (algorithm) => {
-    console.log("select Algo");
     this.setState({ algorithm: algorithm });
-    console.log(this.state.algorithm);
   };
+
   selectMaze = (maze) => {
-    console.log("select Maze");
     this.setState({ maze: maze });
-    console.log(this.state.maze);
-    this.getBasicRandomMaze();
+    if (maze === "Basic Random Maze") {
+      this.getBasicRandomMaze();
+    } else if (maze === "Simple Stair Pattern") {
+      this.getStairMaze();
+    } else if (maze === "Recursive Maze Pattern") {
+      this.getRecursiveMaze(this.state.grid, 2, NUM_GRID_ROWS - 3, 2, NUM_GRID_COLS - 3, "horizontal", false, NUM_GRID_ROWS, NUM_GRID_COLS);
+    }
   };
+
   getBasicRandomMaze = () => {
     const grid = this.state.grid;
-    for (let row = 0; row < NUM_GRID_ROWS; row++) {
-      for (let col = 0; col < NUM_GRID_COLS; col++) {
-        let isWall = Math.floor(Math.random() * 10);
-        const node = grid[row][col];
-        if (!node.isStart && !node.isFinish) {
-          node.isWall = isWall > 6 ? true : false;
-        }
-        node.isVisited = false;
-        node.distance = Infinity;
-        node.previousNode = null;
-        if (node.isStart) {
-          document.getElementById(`node-${node.row}-${node.col}`).className =
-            "node node-start";
-        } else if (node.isFinish) {
-          document.getElementById(`node-${node.row}-${node.col}`).className =
-            "node node-finish";
-        } else if (node.isWall) {
-          document.getElementById(`node-${node.row}-${node.col}`).className =
-            "node node-wall";
-        } else {
-          document.getElementById(`node-${node.row}-${node.col}`).className =
-            "node ";
-        }
-      }
-    }
+    generateBasicRandomMaze(grid, NUM_GRID_ROWS, NUM_GRID_COLS);
+    this.setState({ grid });
+  };
+  getStairMaze = () => {
+    const grid = this.state.grid;
+    generateStairMaze(grid, NUM_GRID_ROWS, NUM_GRID_COLS);
     this.setState({ grid });
   };
 
+  getRecursiveMaze(grid, rowStart, rowEnd, colStart, colEnd, orientation, surroundingwalls, maxRows, maxCols) {
+    generateRecursiveMaze(grid, rowStart, rowEnd, colStart, colEnd, orientation, surroundingwalls, maxRows, maxCols);
+    this.setState({ grid });
+  }
+
   visualizeAlgorithm() {
-    const {
-      grid,
-      startRow,
-      startCol,
-      finishRow,
-      finishCol,
-      algorithm,
-    } = this.state;
-    const startNode = grid[startRow][startCol];
-    const finishNode = grid[finishRow][finishCol];
+    const { grid, algorithm } = this.state;
+    const startNode = grid[this.startRow][this.startCol];
+    const finishNode = grid[this.finishRow][this.finishCol];
     let visitedNodesInOrder;
     if (algorithm === "Dijstra's Algorithm") {
       visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
     } else if (algorithm === "Breadth First Search") {
       visitedNodesInOrder = breadthFirstSearch(grid, startNode, finishNode);
+    } else if (algorithm === "A* Algorithm") {
+      visitedNodesInOrder = astar(grid, startNode, finishNode);
+    } else if (algorithm === "Greedy Algorithm") {
+      visitedNodesInOrder = greedy(grid, startNode, finishNode);
     } else {
       return;
     }
     const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
     this.animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder);
   }
-
-  // visualizeDijkstra() {
-  //   const { grid, startRow, startCol, finishRow, finishCol } = this.state;
-  //   const startNode = grid[startRow][startCol];
-  //   const finishNode = grid[finishRow][finishCol];
-  //   const visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
-  //   const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
-  //   this.animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder);
-  // }
-  // visualizeBreadthFirstSearch() {
-  //   const { grid, startRow, startCol, finishRow, finishCol } = this.state;
-  //   const startNode = grid[startRow][startCol];
-  //   const finishNode = grid[finishRow][finishCol];
-  //   const visitedNodesInOrder = breadthFirstSearch(grid, startNode, finishNode);
-  //   const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
-  //   this.animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder);
-  // }
 
   render() {
     const { grid, mouseIsPressed } = this.state;
@@ -255,16 +241,6 @@ export default class PathfindingVisualizer extends Component {
         >
           {" "}
         </Header>
-        {/* <button
-          onClick={() => this.visualizeAlgorithm()}
-          disabled={this.state.algorithm === ""}
-        >
-          Visualize
-        </button> */}
-        {/* <button onClick={() => this.visualizeBreadthFirstSearch()}>
-          Visualize Breadth First Search Algorithm
-        </button> */}
-        {/* <button onClick={() => this.getClearGrid(grid)}>Clear Board</button> */}
         <div className="grid">
           {grid.map((row, rowIdx) => {
             return (
@@ -279,11 +255,9 @@ export default class PathfindingVisualizer extends Component {
                       isStart={isStart}
                       isWall={isWall}
                       mouseIsPressed={mouseIsPressed}
-                      onMouseDown={(row, col) => this.handleMouseDown(row, col)}
-                      onMouseEnter={(row, col) =>
-                        this.handleMouseEnter(row, col)
-                      }
-                      onMouseUp={(row, col) => this.handleMouseUp(row, col)}
+                      onMouseDown={(e, row, col) => this.handleMouseDown(e, row, col)}
+                      onMouseEnter={(e, row, col) => this.handleMouseEnter(e, row, col)}
+                      onMouseUp={(e, row, col) => this.handleMouseUp(e, row, col)}
                       row={row}
                     ></Node>
                   );
@@ -317,6 +291,7 @@ const createNode = (col, row, isWall) => {
     isStart: row === START_NODE_ROW && col === START_NODE_COL,
     isFinish: row === FINISH_NODE_ROW && col === FINISH_NODE_COL,
     distance: Infinity,
+    totDistance: Infinity,
     isVisited: false,
     isWall: isWall,
     previousNode: null,
@@ -324,17 +299,10 @@ const createNode = (col, row, isWall) => {
 };
 
 const getNewGridWithWallToggled = (grid, row, col) => {
-  if (!grid[row][col].isStart && !grid[row][col].isFinish) {
-    const newGrid = grid.slice();
-    const node = newGrid[row][col];
-    const newNode = {
-      ...node,
-      isWall: !node.isWall,
-    };
-
-    newGrid[row][col] = newNode;
-    return newGrid;
-  } else {
-    return grid;
+  let currentNode = grid[row][col];
+  let element = document.getElementById(`node-${row}-${col}`);
+  if (!currentNode.isStart && !currentNode.isFinish) {
+    currentNode.isWall = !currentNode.isWall;
+    element.className = currentNode.isWall ? "node node-wall" : "node node-unvisited";
   }
 };
