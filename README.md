@@ -1,5 +1,7 @@
 Welcome to Pathfinding Visualizer!
 
+The source code is located at: https://github.com/jamesr1775/pathfinding_visualizer
+
 This application supports the following algorithms:
 
 Dijkstra's Algorithm: the father of pathfinding algorithms; guarantees the shortest path
