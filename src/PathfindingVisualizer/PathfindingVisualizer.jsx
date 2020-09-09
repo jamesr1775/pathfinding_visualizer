@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Node from "./Node/Node";
 import Header from "../layout/Header";
+import Legend from "../layout/Legend";
 
 import { dijkstra } from "../algorithms/dijkstra";
 import { breadthFirstSearch } from "../algorithms/breadthFirstSearch";
@@ -18,9 +19,9 @@ const NUM_GRID_ROWS = 30;
 const NUM_GRID_COLS = 75;
 
 const START_NODE_ROW = 14;
-const START_NODE_COL = 16;
+const START_NODE_COL = 9;
 const FINISH_NODE_ROW = 14;
-const FINISH_NODE_COL = 19;
+const FINISH_NODE_COL = 66;
 
 export default class PathfindingVisualizer extends Component {
   constructor() {
@@ -109,16 +110,9 @@ export default class PathfindingVisualizer extends Component {
   }
 
   handleMouseUp(e) {
-    //const { grid, moveStartPos, moveFinishPos } = this.state;
     this.mouseIsPressed = false;
     this.moveStartPos = false;
     this.moveFinishPos = false;
-    // if (moveStartPos) {
-    //   this.setState({ grid: grid, mouseIsPressed: false, moveStartPos: false });
-    // } else if (moveFinishPos) {
-    // } else {
-    //   this.setState({ mouseIsPressed: false });
-    // }
   }
 
   animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder) {
@@ -152,7 +146,7 @@ export default class PathfindingVisualizer extends Component {
     }
   }
 
-  getClearGrid = () => {
+  getClearPath = () => {
     const grid = this.state.grid;
     for (let row = 0; row < NUM_GRID_ROWS; row++) {
       //const currentRow = [];
@@ -162,32 +156,56 @@ export default class PathfindingVisualizer extends Component {
         node.distance = Infinity;
         node.totDistance = Infinity;
         node.previousNode = null;
-        if (node.isStart) {
-          document.getElementById(`node-${node.row}-${node.col}`).className = "node node-start";
-        } else if (node.isFinish) {
-          document.getElementById(`node-${node.row}-${node.col}`).className = "node node-finish";
-        } else if (node.isWall) {
-          document.getElementById(`node-${node.row}-${node.col}`).className = "node node-wall";
+        let element = document.getElementById(`node-${node.row}-${node.col}`);
+        if (node.isStart || node.isFinish) {
+          element.className = node.isStart ? "node node-start" : node.isFinish ? "node node-finish" : "node ";
         } else {
-          document.getElementById(`node-${node.row}-${node.col}`).className = "node ";
+          element.className = node.isWall ? "node node-wall" : "node";
         }
       }
     }
     this.setState({ grid });
   };
+  getClearWalls = () => {
+    const grid = this.state.grid;
+    for (let row = 0; row < NUM_GRID_ROWS; row++) {
+      //const currentRow = [];
+      for (let col = 0; col < NUM_GRID_COLS; col++) {
+        const node = grid[row][col];
+        node.isVisited = false;
+        node.distance = Infinity;
+        node.totDistance = Infinity;
+        node.previousNode = null;
+        let element = document.getElementById(`node-${node.row}-${node.col}`);
+        if (node.isWall) {
+          node.isWall = false;
+          element.className = "node ";
+        }
+      }
+    }
+    // this.setState({ grid });
+  };
+
+  getClearGrid = () => {
+    this.getClearPath();
+    this.getClearWalls();
+  };
 
   selectAlgorithm = (algorithm) => {
+    document.querySelector("#VisBtn").innerHTML = `Visualize ${algorithm}`;
     this.setState({ algorithm: algorithm });
   };
 
   selectMaze = (maze) => {
-    this.setState({ maze: maze });
+    this.getClearWalls();
+    this.getClearPath();
+    //this.setState({ maze: maze });
     if (maze === "Basic Random Maze") {
       this.getBasicRandomMaze();
     } else if (maze === "Simple Stair Pattern") {
       this.getStairMaze();
     } else if (maze === "Recursive Maze Pattern") {
-      this.getRecursiveMaze(this.state.grid, 2, NUM_GRID_ROWS - 3, 2, NUM_GRID_COLS - 3, "horizontal", false, NUM_GRID_ROWS, NUM_GRID_COLS);
+      this.getRecursiveMaze(2, NUM_GRID_ROWS - 3, 2, NUM_GRID_COLS - 3, "horizontal", false, NUM_GRID_ROWS, NUM_GRID_COLS);
     }
   };
 
@@ -202,8 +220,23 @@ export default class PathfindingVisualizer extends Component {
     this.setState({ grid });
   };
 
-  getRecursiveMaze(grid, rowStart, rowEnd, colStart, colEnd, orientation, surroundingwalls, maxRows, maxCols) {
+  getRecursiveMaze(rowStart, rowEnd, colStart, colEnd, orientation, surroundingwalls, maxRows, maxCols) {
+    const grid = this.state.grid;
     generateRecursiveMaze(grid, rowStart, rowEnd, colStart, colEnd, orientation, surroundingwalls, maxRows, maxCols);
+    for (let row = 0; row < maxRows; row++) {
+      for (let col = 0; col < maxCols; col++) {
+        const node = grid[row][col];
+        if (node.isStart) {
+          document.getElementById(`node-${node.row}-${node.col}`).className = "node node-start";
+        } else if (node.isFinish) {
+          document.getElementById(`node-${node.row}-${node.col}`).className = "node node-finish";
+        } else if (node.isWall) {
+          document.getElementById(`node-${node.row}-${node.col}`).className = "node node-wall";
+        } else {
+          document.getElementById(`node-${node.row}-${node.col}`).className = "node ";
+        }
+      }
+    }
     this.setState({ grid });
   }
 
@@ -221,6 +254,7 @@ export default class PathfindingVisualizer extends Component {
     } else if (algorithm === "Greedy Algorithm") {
       visitedNodesInOrder = greedy(grid, startNode, finishNode);
     } else {
+      document.querySelector("#VisBtn").innerHTML = "Pick Algorithm";
       return;
     }
     const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
@@ -232,15 +266,19 @@ export default class PathfindingVisualizer extends Component {
 
     return (
       <>
+        {/* <div> */}
         <Header
           selectAlgorithm={this.selectAlgorithm}
           selectMaze={this.selectMaze}
           algorithm={this.state.algorithm}
           visualizeAlgorithm={this.visualizeAlgorithm.bind(this)}
-          getClearGrid={this.getClearGrid.bind(this)}
+          getClearPath={this.getClearPath}
+          getClearWalls={this.getClearWalls}
+          getClearGrid={this.getClearGrid}
         >
           {" "}
         </Header>
+        <Legend></Legend>
         <div className="grid">
           {grid.map((row, rowIdx) => {
             return (

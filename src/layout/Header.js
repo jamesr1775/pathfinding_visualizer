@@ -7,8 +7,8 @@ const algorithms = [
   { label: "Dijstra's Algorithm", value: 1 },
   { label: "Breadth First Search", value: 2 },
   { label: "A* Algorithm", value: 3 },
-  { label: "Depth First Search", value: 4 },
-  { label: "Greedy Algorithm", value: 5 },
+  { label: "Greedy Algorithm", value: 4 },
+  // { label: "Depth First Search", value: 5 },
 ];
 const patterns = [
   { label: "Basic Random Maze", value: 1 },
@@ -62,11 +62,17 @@ export class Header extends Component {
                   onChange={this.handleChangeMaze}
                 />
               </div>
-              <button style={buttonStyle} onClick={() => this.props.visualizeAlgorithm()} disabled={this.props.algorithm === ""}>
+              <button style={buttonStyle} id="VisBtn" onClick={() => this.props.visualizeAlgorithm()}>
                 Visualize
               </button>
+              <button style={buttonStyle} onClick={() => this.props.getClearPath()}>
+                Clear Path
+              </button>
+              <button style={buttonStyle} onClick={() => this.props.getClearWalls()}>
+                Clear Walls
+              </button>
               <button style={buttonStyle} onClick={() => this.props.getClearGrid()}>
-                Clear Board
+                Clear Grid
               </button>
             </div>
           </div>
@@ -83,6 +89,8 @@ Header.propTypes = {
   selectMaze: PropTypes.func.isRequired,
   visualizeAlgorithm: PropTypes.func.isRequired,
   algorithm: PropTypes.object.isRequired,
+  getClearPath: PropTypes.func.isRequired,
+  getClearWalls: PropTypes.func.isRequired,
   getClearGrid: PropTypes.func.isRequired,
   grid: PropTypes.object.isRequired,
 };
@@ -95,10 +103,10 @@ const headerStyle = {
 };
 
 const buttonStyle = {
-  //background: "#34495e",
-  //color: "#fff",
+  borderRadius: "4px",
+  color: "black",
   textAlign: "center",
-  fontSize: "15px",
+  fontSize: "18px",
   padding: "10px",
   display: "",
 };

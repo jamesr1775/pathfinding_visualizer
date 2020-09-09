@@ -1,8 +1,8 @@
 export function generateStairMaze(grid, maxRows, maxCols) {
-  let currentRow = maxRows;
+  let currentRow = maxRows - 1;
   let directionUp = true;
   for (let col = 0; col < maxCols - 1; col++) {
-    if (currentRow > 0 && directionUp) {
+    if (currentRow > 1 && directionUp) {
       currentRow--;
     } else if (currentRow < maxRows - 1 - 1 && !directionUp) {
       currentRow++;
@@ -27,5 +27,4 @@ export function generateStairMaze(grid, maxRows, maxCols) {
       document.getElementById(`node-${node.row}-${node.col}`).className = "node ";
     }
   }
-  //return grid;
 }
