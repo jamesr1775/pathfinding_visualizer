@@ -1,5 +1,7 @@
 Welcome to Pathfinding Visualizer!
 
+See it in action at : https://jamesr1775.github.io/pathfinding_visualizer_dep/
+
 The source code is located at: https://github.com/jamesr1775/pathfinding_visualizer
 
 This application supports the following algorithms:
